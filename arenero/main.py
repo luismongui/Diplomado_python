@@ -47,9 +47,13 @@ def validacion_conexion(red,clave):
 
        
 def message_using(message):
-    @bot.add_message_handler('Hola')
+    @bot.add_message_handler('Menu')
     def help(update):
-        update.reply('Hola Luis,'+ message)
+        update.reply('''Hola Luis,
+                        \n Arenero Inteligente \U0001F408
+                        \n limpieza manual: 2
+                        \n limpieza automatica: 3
+                        \Gracias por usar nuestro protoipo'''+ message)
 
 def message_using2():
     @bot.add_message_handler('manual')
@@ -129,6 +133,7 @@ def detecccion_mascota():
     if lecturaInfl==0 and lecturaPir==1:
         contar_uso(1)
         print("Gato en arenero....",contadorUso)
+        message_using("El arenero esta en uso ")
     else:
         contar_uso(0)
         message_using("El arenero no esta en uso: ")
@@ -136,6 +141,7 @@ def detecccion_mascota():
 while True:
     global contadorUso
     detecccion_mascota()
+    message_using("usando prototipo automatico")
     if contadorUso>=100  :
         limpieza_automatica
         print("realizando  limpieza")
