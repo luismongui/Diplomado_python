@@ -19,28 +19,40 @@ rojo = Pin(22,Pin.OUT)
 sensorPir = Pin(21,Pin.IN)
 sensorInfl = Pin(19,Pin.IN)
 
-def pasos(v1, v2, v3, v4):
+def salida(v1, v2, v3, v4):
     in1.value(v1)
     in2.value(v2)
     in3.value(v3)
     in4.value(v4)
-    sleep_ms(10)
+    sleep_ms(15)
     
-def contadorPir(num):
-    num=num+1
-    return num
-def contadorInfl(num):
-    num=num+1
-    return num
-
-def secuencia_dos_antirelog(cantidad):
+def giro_fase1(cantidad):
   for i in range (cantidad):
-    pasos(1,0,0,0)
-    pasos(0,1,0,0)
-    pasos(0,0,1,0)
-    pasos(0,0,0,1)
-    #print(i)
-    
+    salida (0,0,1,1)
+    salida (0,1,1,0)
+    salida (1,1,0,0)
+    salida (1,0,0,1)
+    print(i)
+
+def giro_fase2(cantidad):
+  for i in range (cantidad):
+    salida (1,1,0,0)
+    salida (0,1,1,0)
+    salida (0,0,1,1)
+    salida (1,0,0,1)
+    print(i)
+def giro_intermedio(cantidad):
+  for i in range (cantidad):
+    salida (0,0,1,1)
+    salida (0,0,1,0)
+    salida (0,1,1,0)
+    salida (0,1,0,0)
+    salida (1,1,0,0)
+    salida (1,0,0,0)
+    salida (1,0,0,1)
+    salida (0,0,0,1)
+
+    print(i)
 def secuencia_dos_relog(cantidad):
   for i in range (cantidad):
     pasos(1,1,0,0)
@@ -51,7 +63,7 @@ def secuencia_dos_relog(cantidad):
     
 def estado_sensor_pir():
     estado_pir = sensorPir.value()
-    sleep(0.5)
+    sleep(0.15)
     #print ("estado_pir",estado_pir)
     return estado_pir    
 def estado_sensor_inflarojo():
@@ -68,7 +80,7 @@ while True:
     if lecturaPir==1 :
         print("Gato en arenero....")
         enceder_led()
-        secuencia_dos_relog(80)
+        giro_fase2(100)
     else:
      print("sin uso")
 
