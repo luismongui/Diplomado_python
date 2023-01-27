@@ -1,26 +1,32 @@
+from sys import path
+path.append('..\\modulos')
 from machine import Pin
 from utime import sleep, sleep_ms
-import network, time
+import network, time, urequests
+import _thread
 from utelegram import Bot
+
+
 
 TOKEN ='5530963040:AAE2WXhUzcULWyUHNsPpHwpE9FlLz8pv9pg'
 bot = Bot(TOKEN) 
-
 #Variables Globales
-global estado_pir,estado_infl,contadorUso
+global estado_pir,estado_infl,contadorUso,manual,auto
 estado_pir = 0
 estado_infl = 0
 contadorUso = 0
+decremento =0
+manual = 0
+auto = 0
 #Lado Izquierdo
 in1 = Pin(16, Pin.OUT)
 in2 = Pin(17, Pin.OUT)
 #Lado Derecho
-in3 = Pin(5, Pin.OUT)
+in3 = Pin(19, Pin.OUT)
 in4 = Pin(18, Pin.OUT)
 #Sensor
-rojo = Pin(19,Pin.OUT)
-sensorPir = Pin(21,Pin.IN)
-sensorInfl = Pin(2,Pin.IN)
+sensorPir = Pin(2,Pin.IN)
+sensorInfl = Pin(21,Pin.IN)
 #Conectar a
 #Conexion a wifi
 def conectaWifi (red, password):
@@ -31,6 +37,7 @@ def conectaWifi (red, password):
           miRed.connect(red, password)         #Intenta conectar con la red
           print('Conectando a la red', red +"…")
           timeout = time.time ()
+          url ="https://maker.ifttt.com/trigger/deteccion_mascota/with/key/iCzsMo5HGaJhodkQmnr-RtbEPo3OUdXYLQRkQuCIRj2?"
           while not miRed.isconnected():           #Mientras no se conecte..
               if (time.ticks_diff (time.time (), timeout) > 10):
                   return False
@@ -45,25 +52,29 @@ def validacion_conexion(red,clave):
            miRed.active (False)
     
 
-       
-def message_using(message):
-    @bot.add_message_handler('Menu')
+def message_using():
+    @bot.add_message_handler('Hola')
     def help(update):
-        update.reply('''Hola Luis,
-                        \n Arenero Inteligente \U0001F408
-                        \n limpieza manual: 2
-                        \n limpieza automatica: 3
-                        \Gracias por usar nuestro protoipo'''+ message)
+        update.reply('''Hola Luis,Soy cathouse en que te puedo ayudar''')
+def message_usingArenero():
+    @bot.add_message_handler('arenero')
+    def help(update):
+        update.reply('''Arenero Inteligente \U0001F408,
+                        \n limpieza manual: manual
+                        \n limpieza automatica: auto
+                        \Gracias por usar nuestro protoipo''')
 
 def message_using2():
     @bot.add_message_handler('manual')
     def help(update):
-        update.reply('Limpieza manual')
+        update.reply('Se inicia proceso manual')
+        manual=2
         
 def message_using3():
-    @bot.add_message_handler('automatico')
+    @bot.add_message_handler('auto')
     def help(update):
-        update.reply('Limpieza automatoca')
+        update.reply('Limpieza automatico')
+        auto=3
           
     bot.start_loop()
   
@@ -72,14 +83,21 @@ def pasos(v1, v2, v3, v4):
     in2.value(v2)
     in3.value(v3)
     in4.value(v4)
-    sleep_ms(15)
-
-def secuencia_dos_antirelog(cantidad):
+    sleep(0.02)
+    
+def secuencia_una(cantidad):
   for i in range (cantidad):
     pasos(1,0,0,0)
     pasos(0,1,0,0)
     pasos(0,0,1,0)
     pasos(0,0,0,1)
+    #print(i)
+def secuencia_dos(cantidad):
+  for i in range (cantidad):
+    pasos(1,1,0,0)
+    pasos(0,1,1,0)
+    pasos(0,0,1,1)
+    pasos(1,0,0,1)
     #print(i)
     
 def secuencia_dos_relog(cantidad):
@@ -98,10 +116,7 @@ def estado_sensor_pir():
 def estado_sensor_inflarojo():
     estado_infl = sensorInfl.value()
     sleep(0.5)
-    #sleep_ms(10)
     return estado_infl
-
-
 
 #Esta funcion permite que se pueda contar la cantidad de veces que se identifica un gato dentro de la arenera
 def contar_uso(n):
@@ -115,37 +130,66 @@ def contar_uso(n):
         return contadorUso
     
 validacion_conexion("FamiliaM&M_router", "@S41rus3110")
-
-def limpieza_automatica():
-    if contadorUso>=3:
-       #secuencia_dos_relog(60)
-       print("Limpieando arenero")
-       contadorUso =0
-    else:
-       print("El Arenero sigue en uso")
-
+def uso_telegram():
+    respuesta = urequests.get(url+"&value1="+"200"+"&value2="+"El arenero esta en uso")
+    print(respuesta.text)
+    print(respuesta.status_code)
+    respuesta.close ()
     
-        
+    
+def limpieza_automatica():
+     if manual==2:
+         secuencia_una(10)
+         print("Limpieando arenero manualmente")
+     else:
+        secuencia_una(10)
+        print("Limpieando arenero manualmente")
+      
 def detecccion_mascota():
     lecturaPir = estado_sensor_pir()
     lecturaInfl = estado_sensor_inflarojo()
-    print("Est Pir:",lecturaPir,"Est Inf",lecturaInfl)
+    print("Se encontro mascota con sensor Pir: ",lecturaPir)
+    #message_using("probando mensaje")
     if lecturaInfl==0 and lecturaPir==1:
         contar_uso(1)
-        print("Gato en arenero....",contadorUso)
-        message_using("El arenero esta en uso ")
+        #print("Gato en arenero....",contadorUso)
     else:
         contar_uso(0)
-        message_using("El arenero no esta en uso: ")
-        print("sin uso el arenero")
-while True:
-    global contadorUso
+        #message_using("El arenero no esta en uso: ")
+        #print("sin uso el arenero")
+        
+#metodo de deteccion automatica         
+def tarea_uno():
+ while True:
     detecccion_mascota()
-    message_using("usando prototipo automatico")
-    if contadorUso>=100  :
-        limpieza_automatica
-        print("realizando  limpieza")
-        contadorUso = 0
-    else:
-        print("continuar deteccion")
+    uso_telegram()
+_thread.start_new_thread(tarea_uno,())
+  
+def contar_uso(n):
+    global contadorUso
+    while True:
+        if n >= 1:
+            contadorUso = contadorUso + 1
+            print("Uso x segundo",contadorUso,n)
+        else:
+            break
+        return contadorUso
 
+def tarea_dos():
+    global decremento
+    for i in range(1,contadorUso):
+         if contadorUso >= 6:
+            limpieza_automatica() 
+            decremento = contadorUso - 2 
+         else:
+            print("continuar deteccion automatica")
+    
+#metodo de limpieza automatica
+while True:
+    tarea_dos()
+    print("Conteo de uso:",contadorUso,"decremento;",decremento)
+
+    
+    
+    
+    
