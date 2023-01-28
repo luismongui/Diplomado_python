@@ -51,32 +51,6 @@ def validacion_conexion(red,clave):
            print ("Imposible conectar")
            miRed.active (False)
     
-
-#def message_using():
-#    @bot.add_message_handler('Hola')
-#    def help(update):
-#        update.reply('''Hola Luis,Soy cathouse en que te puedo ayudar''')
-#def message_usingArenero():
-#    @bot.add_message_handler('arenero')
-#    def help(update):
-#        update.reply('''Arenero Inteligente \U0001F408,
-#                        \n limpieza manual: manual
-#                        \n limpieza automatica: auto
-#                        \Gracias por usar nuestro protoipo''')#
-
-#def message_using2():
-#    @bot.add_message_handler('manual')
-#    def help(update):
-#        update.reply('Se inicia proceso manual')
-#        manual=2
-        
-#def message_using3():
-#    @bot.add_message_handler('auto')
-#    def help(update):
-#        update.reply('Limpieza automatico')
-#        auto=3         
-#    bot.start_loop()
-  
 def pasos(v1, v2, v3, v4):
     in1.value(v1)
     in2.value(v2)
