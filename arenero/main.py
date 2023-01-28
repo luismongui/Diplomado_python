@@ -8,6 +8,7 @@ from utelegram import Bot
 
 
 
+
 TOKEN ='5530963040:AAE2WXhUzcULWyUHNsPpHwpE9FlLz8pv9pg'
 bot = Bot(TOKEN) 
 #Variables Globales
@@ -112,12 +113,9 @@ def uso_telegram():
     
     
 def limpieza_automatica():
-     if manual==2:
-         secuencia_una(10)
-         print("Limpieando arenero manualmente")
-     else:
-        secuencia_una(10)
-        print("Limpieando arenero manualmente")
+    secuencia_una(2)
+    print("Limpiando arenero de manera automatica")
+    
 #Este metodo permite utilizar un sensor pir para determinar si el arenero esta en uso      
 def detecccion_mascota():
     lecturaPir = estado_sensor_pir()
@@ -148,16 +146,15 @@ def contar_uso(n):
 def tarea_dos():
     global decremento
     for i in range(1,contadorUso):
-         if contadorUso >= 6:
+         if contadorUso >= 3:
             limpieza_automatica() 
-            decremento = contadorUso - 2 
+            decremento = contadorUso - 2
          else:
-            print("continuar deteccion automatica")
-    
+            print("continuar deteccion automatica",contadorUso)    
 #metodo de limpieza automatica
 while True:
     tarea_dos()
-    #print("Conteo de uso:",contadorUso,"decremento;",decremento)
+    print("Conteo de uso:",contadorUso,"decremento;",decremento)
 
     
     
