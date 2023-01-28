@@ -52,31 +52,30 @@ def validacion_conexion(red,clave):
            miRed.active (False)
     
 
-def message_using():
-    @bot.add_message_handler('Hola')
-    def help(update):
-        update.reply('''Hola Luis,Soy cathouse en que te puedo ayudar''')
-def message_usingArenero():
-    @bot.add_message_handler('arenero')
-    def help(update):
-        update.reply('''Arenero Inteligente \U0001F408,
-                        \n limpieza manual: manual
-                        \n limpieza automatica: auto
-                        \Gracias por usar nuestro protoipo''')
+#def message_using():
+#    @bot.add_message_handler('Hola')
+#    def help(update):
+#        update.reply('''Hola Luis,Soy cathouse en que te puedo ayudar''')
+#def message_usingArenero():
+#    @bot.add_message_handler('arenero')
+#    def help(update):
+#        update.reply('''Arenero Inteligente \U0001F408,
+#                        \n limpieza manual: manual
+#                        \n limpieza automatica: auto
+#                        \Gracias por usar nuestro protoipo''')#
 
-def message_using2():
-    @bot.add_message_handler('manual')
-    def help(update):
-        update.reply('Se inicia proceso manual')
-        manual=2
+#def message_using2():
+#    @bot.add_message_handler('manual')
+#    def help(update):
+#        update.reply('Se inicia proceso manual')
+#        manual=2
         
-def message_using3():
-    @bot.add_message_handler('auto')
-    def help(update):
-        update.reply('Limpieza automatico')
-        auto=3
-          
-    bot.start_loop()
+#def message_using3():
+#    @bot.add_message_handler('auto')
+#    def help(update):
+#        update.reply('Limpieza automatico')
+#        auto=3         
+#    bot.start_loop()
   
 def pasos(v1, v2, v3, v4):
     in1.value(v1)
@@ -131,7 +130,8 @@ def contar_uso(n):
     
 validacion_conexion("FamiliaM&M_router", "@S41rus3110")
 def uso_telegram():
-    respuesta = urequests.get(url+"&value1="+"200"+"&value2="+"El arenero esta en uso")
+    url = "https://maker.ifttt.com/trigger/deteccion_mascota/with/key/iCzsMo5HGaJhodkQmnr-RtbEPo3OUdXYLQRkQuCIRj2?"
+    respuesta = urequests.get(url+"&value1="+"200"+"&value2="+"Arenero Inteligente \U0001F408, El arenero esta en uso"+"&value3="+"Esperando para limpieza")
     print(respuesta.text)
     print(respuesta.status_code)
     respuesta.close ()
@@ -144,25 +144,21 @@ def limpieza_automatica():
      else:
         secuencia_una(10)
         print("Limpieando arenero manualmente")
-      
+#Este metodo permite utilizar un sensor pir para determinar si el arenero esta en uso      
 def detecccion_mascota():
     lecturaPir = estado_sensor_pir()
     lecturaInfl = estado_sensor_inflarojo()
     print("Se encontro mascota con sensor Pir: ",lecturaPir)
-    #message_using("probando mensaje")
     if lecturaInfl==0 and lecturaPir==1:
         contar_uso(1)
-        #print("Gato en arenero....",contadorUso)
+        uso_telegram()
     else:
         contar_uso(0)
-        #message_using("El arenero no esta en uso: ")
-        #print("sin uso el arenero")
         
 #metodo de deteccion automatica         
 def tarea_uno():
  while True:
     detecccion_mascota()
-    uso_telegram()
 _thread.start_new_thread(tarea_uno,())
   
 def contar_uso(n):
@@ -187,7 +183,7 @@ def tarea_dos():
 #metodo de limpieza automatica
 while True:
     tarea_dos()
-    print("Conteo de uso:",contadorUso,"decremento;",decremento)
+    #print("Conteo de uso:",contadorUso,"decremento;",decremento)
 
     
     
